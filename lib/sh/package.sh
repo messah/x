@@ -103,11 +103,11 @@ adddebrepository() {
 	""|-) components='main' ;;
 	esac
 	case "$repository" in
-	http:|ftp:) ;;
+	http:*|ftp:*) ;;
 	*) repository="http://${repository}" ;;
 	esac
 	case "$keyurl" in
-	http:|ftp:) ;;
+	http:*|ftp:*) ;;
 	"") ;;
 	*) keyurl="http://${keyurl}" ;;
 	esac
@@ -120,9 +120,14 @@ deb $repository $distribution $components
 EOF
 "
 		if [ -n "$keyurl" ]; then
-			wget "$keyurl" -qO- | sudo apt-key add -
+			wget "$keyurl" -qO- 2>/dev/null | sudo apt-key add - ||:
 		fi
+
+		# indeks güncellemesi gerekiyor
+		return 0
 	fi
+
+	return 1
 }
 
 # wajig sarmalayıcı
